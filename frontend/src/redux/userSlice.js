@@ -1,5 +1,14 @@
-import { createSlice} from '@reduxjs/toolkit'
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
+import axios from 'axios';
 
+
+export const updateUser2 = createAsyncThunk("users/update",async (user) =>{
+      const res = await axios.post(
+            "http://localhost:3002/api/post/1/create",
+            user
+      );
+      return res.data;
+});
 
 const userSlice = createSlice({
 
@@ -51,10 +60,25 @@ const userSlice = createSlice({
             }
       
 
+      },
+      //With thunk (no need of apiCalls file)
+      extraReducers:{
+            [updateUser2.pending]:(state)=>{
+                  state.pending=true;
+                  state.error=false;
+            },
+            [updateUser2.fulfilled]:(state,action) =>{
+                  state.pending=false;
+                  state.userInfo=action.payload;
+            },
+            [updateUser2.rejected]:(state)=>{
+                  state.pending=null;
+                  state.error=true;
+            }
       }
 });
 
-
+//Without thunk
 export const {updateStart,updateSuccess,updateError,deleteError,deleteStart,deleteSuccess} =userSlice.actions;
 
 export default userSlice.reducer;
